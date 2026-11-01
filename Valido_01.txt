@@ -1,0 +1,12 @@
+PROGRAM basico.
+VAR
+    idade : INTEGER;
+    nome : STRING;
+    salario : REAL;
+BEGIN
+    idade := 20 + 5;
+    salario := 1500 / 2;
+    nome := "Kauan";
+    
+    WRITELN(nome);
+END.

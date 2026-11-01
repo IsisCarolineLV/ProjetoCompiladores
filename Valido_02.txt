@@ -1,0 +1,21 @@
+PROGRAM lacoCondicional.
+VAR
+    contador : INTEGER;
+    limite : INTEGER;
+BEGIN
+    contador := 0;
+    limite := 10;
+    
+    WHILE contador < limite DO
+    BEGIN
+        IF contador >= 5 THEN
+            WRITELN("Passou da metade")
+        ELSE
+            WRITELN("Inicio do laco");
+            
+        contador := contador + 1;
+    END;
+    
+    IF contador <> 0 THEN
+        WRITE("Finalizado com sucesso");
+END.

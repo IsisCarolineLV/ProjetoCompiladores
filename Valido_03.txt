@@ -1,0 +1,18 @@
+PROGRAM numerosAvancados.
+VAR
+    pi : REAL;
+    massa : REAL;
+    velocidade : REAL;
+    letra : CHAR;
+BEGIN
+    /* Testando diferentes formatos
+
+ numericos validos */
+    pi := 3.1415;
+    massa := 5.97e24;
+    velocidade := 3x10e8;
+    letra := 'V';
+    
+    IF (pi > 3) ^ (massa <> 0) THEN
+        WRITE("Valores aceitos");
+END.

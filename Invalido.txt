@@ -1,0 +1,22 @@
+PROGRAM teste_erros.
+VAR
+    email@usuario : STRING;
+    taxa : REAL;
+    letra : CHAR;
+BEGIN
+    /* Erro 1: Underline e caractere especial @ */
+    valor_total := 100;
+    email@usuario := "teste";
+    
+    /* Erro 2: Ponto flutuante incompleto */
+    taxa := 150. ;
+    
+    /* Erro 3: Notacao cientifica sem os numeros finais */
+    taxa := 2.5e ;
+    
+    /* Erro 4: Notacao customizada incompleta com sinal */
+    taxa := 4x10e+ ;
+    
+    /* Erro 5: Char mal-formado (tem espaco em vez de fechar as aspas) */
+    letra := 'A ;
+END.

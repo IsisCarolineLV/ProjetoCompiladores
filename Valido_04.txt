@@ -1,0 +1,18 @@
+PROGRAM textosComQuebra.
+VAR
+    mensagem : STRING;
+BEGIN
+    /* 
+       Este eh um comentario
+       que ocupa varias linhas
+       para testar a divisao de tokens
+       na sua interface grafica.
+    */
+    
+    mensagem := "Esta string
+    tambem foi escrita
+    em varias linhas 
+    para o teste visual";
+    
+    WRITELN(mensagem);
+END.
