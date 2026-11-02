@@ -9,14 +9,17 @@ import javax.swing.*; // Importa a estrutura de lista dinamica
 // Classe principal que gerencia a interface grafica (GUI), leitura de arquivos e orquestracao da analise
 public class Main{
     private static String caminhoAtual=""; // Guarda o endereco (caminho absoluto) do arquivo selecionado no computador
-    private static AnalisadorLexico analisador; // Referencia para a instancia do motor do analisador lexico
+    //private static AnalisadorLexico analisadorLexico; // Referencia para a instancia do motor do analisador lexico
+    //private static AnalisadorSintatico analisadorSintatico; // Referencia para a instancia do motor do analisador lexico
     private static JLabel areaErro; // Rotulo visual no rodape que exibe a mensagem descritiva do erro lexico
     private static JPanel areaConteudo; // Painel central onde as linhas do codigo-fonte sao desenhadas
     private static JLabel lblTitulo; // Rotulo que exibe o nome do arquivo selecionado na tela
     private static boolean mostrando = false;
+    private static boolean arquivoFoiAtualizado = false;
 
     private static StringBuilder texto; // Armazena todo o conteudo textual lido do arquivo antes da analise
     private static ArrayList<Linha> linhasComErro; // Lista que guarda apenas as linhas que apresentaram erro para navegacao
+    private static ArrayList<Linha> linhasErradasLexico, linhasErradasSintatico;
     private static int contErro=0; // indice que controla qual erro esta sendo focado no momento pelos botoes
 
     //botoes:
@@ -154,9 +157,10 @@ public class Main{
                 lblTitulo.setText("Arquivo: "+t); // Atualiza o rotulo com o nome do novo arquivo
                 //System.out.println("Caminho lido:" +caminhoAtual);
                 texto = getTexto(); // Le o arquivo do disco, exibe o texto bruto na tela e guarda no StringBuilder
+                btnAnalisar.setEnabled(true); // Libera o botao "Analisar" para uso
+                btnAnalisarLexico.setEnabled(true);
+                btnAnalisarSintatico.setEnabled(false);
             }
-            btnAnalisar.setEnabled(true); // Libera o botao "Analisar" para uso
-            btnAnalisarLexico.setEnabled(true);
         });
 
         // Define a acao executada ao clicar no botao "Analisar"
@@ -165,20 +169,13 @@ public class Main{
                 areaErro.setText("Nenhum arquivo selecionado!"); // Prevencao caso tente analisar sem ter escolhido um arquivo
             }else{
                 texto = getMudancas(); // Le o arquivo do disco para captar mudancas
-                analisador = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
-                resultadoLexico = analisador.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
-                linhasComErro = analisador.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
-                imprimirArquivo(resultadoLexico); // Substitui o texto bruto na tela pelas linhas analisadas com destaque de sintaxe e tooltips
-                contErro=0; // Posiciona o indice de navegacao no primeiro erro (posicao 0)
+                AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
+                resultadoLexico = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
                 
-                // Se pelo menos 1 linha apresentou erro lexico, ativa a navegacao de erros e foca no primeiro erro
-                if(linhasComErro.size()>=1){
-                    btnErroAnterior.setEnabled(true);
-                    btnProximoErro.setEnabled(true);
-                    mostraErro(linhasComErro, 0); // Destaca a primeira linha com erro na tela
-                }
+                linhasComErro = linhasErradasSintatico;
+                imprimir(resultadoSintatico, linhasComErro);
             }
-            
         });
 
         // Define a acao do botao "Mostrar": mostra ou esconde os botoes de passo a passo
@@ -195,25 +192,30 @@ public class Main{
             if(caminhoAtual.equals("")){
                 areaErro.setText("Nenhum arquivo selecionado!"); // Prevencao caso tente analisar sem ter escolhido um arquivo
             }else{
+                arquivoFoiAtualizado = false;
                 StringBuilder textoAux = getMudancas(); // Le o arquivo do disco para captar mudancas
                 if(!texto.equals(textoAux)){
                     texto = textoAux;
-                    analisador = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
-                    resultadoLexico = analisador.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
-                    linhasComErro = analisador.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
+                    AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
+                    resultadoLexico = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                    linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
+                    arquivoFoiAtualizado = true;
                 }
+                linhasComErro = linhasErradasLexico;
+                imprimir(resultadoLexico, linhasComErro);
                 
-                imprimirArquivo(resultadoLexico); // Substitui o texto bruto na tela pelas linhas analisadas com destaque de sintaxe e tooltips
-                contErro=0; // Posiciona o indice de navegacao no primeiro erro (posicao 0)
-                
-                // Se pelo menos 1 linha apresentou erro lexico, ativa a navegacao de erros e foca no primeiro erro
-                if(linhasComErro.size()>=1){
-                    btnErroAnterior.setEnabled(true);
-                    btnProximoErro.setEnabled(true);
-                    mostraErro(linhasComErro, 0); // Destaca a primeira linha com erro na tela
-                }
                 btnAnalisarSintatico.setEnabled(true);
             }
+        });
+
+        btnAnalisarSintatico.addActionListener(e->{
+            if(arquivoFoiAtualizado){
+                AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(); // Instancia o motor lexico passando o texto bruto do arquivo
+                //resultadoSintatico = analisadorSintatico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                //linhasErradasSintatico = analisadorSintatico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
+            }
+            linhasComErro = linhasErradasSintatico;
+            imprimir(resultadoSintatico, linhasComErro);
         });
 
         // Define a acao do botao "Proximo Erro": avanca o contador e foca na proxima linha problematica
@@ -227,6 +229,18 @@ public class Main{
             contErro--;
             mostraErro(linhasComErro, contErro);
         });
+    }
+
+    private static void imprimir(ArrayList<Linha> resultado, ArrayList<Linha> linhasErradas){
+        imprimirArquivo(resultado); // Substitui o texto bruto na tela pelas linhas analisadas com destaque de sintaxe e tooltips
+        contErro=0; // Posiciona o indice de navegacao no primeiro erro (posicao 0)
+        
+        // Se pelo menos 1 linha apresentou erro lexico, ativa a navegacao de erros e foca no primeiro erro
+        if(linhasErradas.size()>=1){
+            btnErroAnterior.setEnabled(true);
+            btnProximoErro.setEnabled(true);
+            mostraErro(linhasErradas, 0); // Destaca a primeira linha com erro na tela
+        }
     }
     
 
