@@ -1,4 +1,5 @@
 PROGRAM teste_erros.
+
 VAR
     email@usuario : STRING;
     taxa : REAL;
