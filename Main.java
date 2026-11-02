@@ -45,7 +45,7 @@ public class Main{
     // Metodo responsavel por instanciar, configurar e posicionar todos os elementos visuais da janela
     public static void criarTela() {
 
-        AnalisadorSintatico.analisar();
+        Tabela.preencher();
 
         //configuracoes do rotulo
         // Obtem o gerenciador global de ToolTips (aqueles baloes que mostram o tipo do token ao passar o mouse)
