@@ -1,12 +1,27 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Stack;
 
 public class AnalisadorSintatico {
 
     private ArrayList<Linha> linhasErradas;
+    private static final Set<String> SINCRONIZACAO = new HashSet<>();
 
+    public void setSinc(){
+        SINCRONIZACAO.add(";");
+        SINCRONIZACAO.add("end");
+        SINCRONIZACAO.add("begin");
+        SINCRONIZACAO.add(".");
+        SINCRONIZACAO.add("$");
+        SINCRONIZACAO.add("if");
+        SINCRONIZACAO.add("while");
+        SINCRONIZACAO.add("var");
+        SINCRONIZACAO.add("procedure");
+    }
+    
     public ArrayList<Linha> getLinhasErradas(){return linhasErradas;}
 
     public ArrayList<Linha> analisar(ArrayList<Palavra> listaTolkens) {
@@ -25,8 +40,16 @@ public class AnalisadorSintatico {
             String s = buscarAcao(pilha.peek(), fila.peek());
 
             if (s == null) {
-                marcarErro(listaTolkens, idxOrig.get(cont));
-                break;
+                do{
+                    if(fila.size()<=0){
+                        break;
+                    }
+                    marcarErro(listaTolkens, idxOrig.get(cont));
+                    fila.poll();
+                    s = fila.peek();
+                    cont++;
+                }while(s == null && !SINCRONIZACAO.contains(s));
+                continue;
             }
             // aceite
             if (s.equals("OK")) {
@@ -45,8 +68,16 @@ public class AnalisadorSintatico {
                 String naoTerminal = separado[1];
                 String destino = buscarAcao(pilha.peek(), naoTerminal);
                 if (destino == null) {
-                    marcarErro(listaTolkens, idxOrig.get(cont));
-                    break;
+                    do{
+                        marcarErro(listaTolkens, idxOrig.get(cont));
+                        if(fila.size()<=0){
+                            break;
+                        }
+                        fila.poll();
+                        s = fila.peek();
+                        cont++;
+                    }while(s == null && !SINCRONIZACAO.contains(s));
+                    continue;
                 }
                 pilha.push(Integer.parseInt(destino));
                 // nao avança token
