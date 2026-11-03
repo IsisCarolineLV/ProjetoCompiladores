@@ -32,8 +32,8 @@ public class Main{
     private static JButton btnMostrar; // Botao para mostrar os botoes de analise lexica e sintatica
 
     //listas de linhas:
-    private static ArrayList<Linha> resultadoLexico = null;
-    private static ArrayList<Linha> resultadoSintatico = null;
+    private static ArrayList<Linha> resultadoAnalise;
+    private static ArrayList<Palavra> listaPalavras;
     
     // Metodo de entrada padrao da aplicacao Java
     public static void main(String[] args){
@@ -154,8 +154,8 @@ public class Main{
             String t = chamarTelaPesquisa(); // Abre a janela de selecao de arquivos e recebe o nome do arquivo escolhido
             if(!t.equals("nenhum arquivo selecionado")){
                 areaConteudo.removeAll(); // Limpa o codigo anterior que estava na tela
-                resultadoLexico = null; //limpa as linhas salvas
-                resultadoSintatico = null;  //limpa as linhas salvas
+                resultadoAnalise = null; //limpa as linhas salvas
+                resultadoAnalise = null;  //limpa as linhas salvas
                 lblTitulo.setText("Arquivo: "+t); // Atualiza o rotulo com o nome do novo arquivo
                 //System.out.println("Caminho lido:" +caminhoAtual);
                 texto = getTexto(); // Le o arquivo do disco, exibe o texto bruto na tela e guarda no StringBuilder
@@ -172,11 +172,11 @@ public class Main{
             }else{
                 texto = getMudancas(); // Le o arquivo do disco para captar mudancas
                 AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
-                resultadoLexico = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                resultadoAnalise = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
                 linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
                 
                 linhasComErro = linhasErradasSintatico;
-                imprimir(resultadoSintatico, linhasComErro);
+                imprimir(resultadoAnalise, linhasComErro);
             }
         });
 
@@ -199,12 +199,13 @@ public class Main{
                 if(!texto.equals(textoAux)){
                     texto = textoAux;
                     AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
-                    resultadoLexico = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                    resultadoAnalise = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
                     linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
                     arquivoFoiAtualizado = true;
+                    listaPalavras = analisadorLexico.listaPalavras;
                 }
                 linhasComErro = linhasErradasLexico;
-                imprimir(resultadoLexico, linhasComErro);
+                imprimir(resultadoAnalise, linhasComErro);
                 
                 btnAnalisarSintatico.setEnabled(true);
             }
@@ -213,11 +214,12 @@ public class Main{
         btnAnalisarSintatico.addActionListener(e->{
             if(arquivoFoiAtualizado){
                 AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(); // Instancia o motor lexico passando o texto bruto do arquivo
-                //resultadoSintatico = analisadorSintatico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
-                //linhasErradasSintatico = analisadorSintatico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
+                resultadoAnalise = analisadorSintatico.analisar(listaPalavras);
+                linhasErradasSintatico = AnalisadorSintatico.linhasErradas;
             }
             linhasComErro = linhasErradasSintatico;
-            imprimir(resultadoSintatico, linhasComErro);
+            System.out.println("analisou sintaticamente :)");
+            imprimir(resultadoAnalise, linhasComErro);
         });
 
         // Define a acao do botao "Proximo Erro": avanca o contador e foca na proxima linha problematica

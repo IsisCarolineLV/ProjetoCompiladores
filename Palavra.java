@@ -5,6 +5,7 @@ import javax.swing.JLabel; // Importa o componente JLabel para criar os rotulos 
 public class Palavra {
     String lexema; // Armazena a cadeia de caracteres exata lida do arquivo (ex: "123", "PROGRAM", ">=")
     String token; // Armazena a classificacao gramatical associada ao lexema (ex: "numero inteiro", "palavra reservada")
+    Boolean errada = false;
     
     // Construtor principal para inicializar uma nova palavra quando o analisador a reconhece
     public Palavra(String lexema, String token) {
@@ -53,6 +54,14 @@ public class Palavra {
         }
     }
 
+    public void setErrada(){
+        errada = true;
+    }
+
+    public boolean isErrada(){
+        return errada;
+    }
+
     // Metodo para obter a classificacao do token, que funciona como gatilho de validacao de erro
     public String getTolken() throws Exception{
         if(token.equals("identificador invalido")) 
@@ -75,5 +84,9 @@ public class Palavra {
         token.equals("caractere especial")) return "#8400a8";
         // Cor de base escura (quase preta) para o que nao foi coberto acima, como operadores e pontuacoes
         return "#1d0505";
+    }
+
+    public boolean isPalavraReservada(){
+        return token.equalsIgnoreCase("palavra reservada");
     }
 }

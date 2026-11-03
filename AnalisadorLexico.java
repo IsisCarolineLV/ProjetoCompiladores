@@ -5,6 +5,7 @@ public class AnalisadorLexico {
 
     private StringBuilder texto; // Armazena todo o codigo-fonte carregado do arquivo
     private int i; // Ponteiro global (cabecote de leitura) que guarda a posicao do caractere atual no texto
+    public ArrayList<Palavra> listaPalavras;
     private ArrayList<Linha> linhasErradas = new ArrayList<>(); // Lista que armazena apenas as linhas que contem erros lexicos
     // Dicionario estatico contendo todas as palavras reservadas da linguagem (baseada em Pascal)
     private static String[] palavrasReservadas = { "ABSOLUTE", "ARRAY", "BEGIN", "CASE",
@@ -77,6 +78,7 @@ public class AnalisadorLexico {
         }
         System.out.println("------------------------------------------");
 
+        listaPalavras = palavras;
         // Envia a lista linear de palavras para ser organizada em objetos Linha e retorna para a tela principal
         return geradorLinhas(palavras);
     }
