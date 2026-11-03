@@ -127,7 +127,7 @@ public class Main{
         
         JPanel paneErro = new JPanel(new BorderLayout()); // Cria o painel inferior para exibir os detalhes dos erros
         paneErro.setBorder(BorderFactory.createTitledBorder("Painel de Erro")); // Cria uma borda desenhada com o titulo "Painel de Erro"
-        areaErro = new JLabel("Nenhum erro encontrado."); // Texto inicial quando nao ha erros
+        areaErro = new JLabel("         Nenhum erro encontrado."); // Texto inicial quando nao ha erros
         areaErro.setForeground(Color.RED); // Pinta a fonte da mensagem de erro de vermelho
         paneErro.add(new JScrollPane(areaErro), BorderLayout.CENTER); // Coloca o texto de erro dentro de uma area com rolagem no centro do painel
         
@@ -174,7 +174,10 @@ public class Main{
                 AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
                 resultadoAnalise = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
                 linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
-                
+                listaPalavras = analisadorLexico.listaPalavras;
+                AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico();
+                resultadoAnalise = analisadorSintatico.analisar(listaPalavras);
+                linhasErradasSintatico  = analisadorSintatico.getLinhasErradas();
                 linhasComErro = linhasErradasSintatico;
                 imprimir(resultadoAnalise, linhasComErro);
             }
@@ -215,7 +218,7 @@ public class Main{
             if(arquivoFoiAtualizado){
                 AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(); // Instancia o motor lexico passando o texto bruto do arquivo
                 resultadoAnalise = analisadorSintatico.analisar(listaPalavras);
-                linhasErradasSintatico = AnalisadorSintatico.linhasErradas;
+                linhasErradasSintatico = analisadorSintatico.getLinhasErradas();
             }
             linhasComErro = linhasErradasSintatico;
             System.out.println("analisou sintaticamente :)");
@@ -244,6 +247,8 @@ public class Main{
             btnErroAnterior.setEnabled(true);
             btnProximoErro.setEnabled(true);
             mostraErro(linhasErradas, 0); // Destaca a primeira linha com erro na tela
+        }else{
+            areaErro.setText("        Nenhum erro encontrado :)");
         }
     }
     

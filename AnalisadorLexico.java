@@ -372,18 +372,6 @@ public class AnalisadorLexico {
                 return novoId;
             }
         }
-
-        /*for(String o: operacoesLogicas){
-            if(lexema.equalsIgnoreCase(o)){
-                novoId = new Palavra(lexema, "operador logico");
-                return novoId;
-            }
-        }
-
-        if(lexema.equalsIgnoreCase("mod")){
-            novoId = new Palavra(lexema, "operador aritmetico");
-            return novoId;
-        }*/
         
         // Se nao consta na lista de palavras reservadas, classifica como identificador (nome de variavel/funcao)
         novoId = new Palavra(lexema, "identificador");
@@ -423,7 +411,7 @@ public class AnalisadorLexico {
             } catch (Exception e) {
                 erroNaLinha = true; // Sinaliza que a linha atual possui erro lexico
                 palavrasLinha.add(p); // Adiciona a palavra invalida na linha mesmo assim para ela ser exibida na tela
-                mensagemErro+="  ------ "+e.getMessage(); // Concatena o detalhe do erro (ex: "identificador invalido: @")
+                mensagemErro+="           "+e.getMessage(); // Concatena o detalhe do erro (ex: "identificador invalido: @")
             }
         }
 

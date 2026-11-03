@@ -5,7 +5,9 @@ import java.util.Stack;
 
 public class AnalisadorSintatico {
 
-    public static ArrayList<Linha> linhasErradas;
+    private ArrayList<Linha> linhasErradas;
+
+    public ArrayList<Linha> getLinhasErradas(){return linhasErradas;}
 
     public ArrayList<Linha> analisar(ArrayList<Palavra> listaTolkens) {
         Queue<String> fila = new LinkedList<>();
@@ -127,7 +129,7 @@ public class AnalisadorSintatico {
         for (Palavra p : palavras) {
             if (p.isErrada()) {
                 erroNaLinha = true;
-                mensagemErro += "  ------ " + p.lexema + " fere a gramatica";
+                mensagemErro += "           \"" + p.lexema + "\" fere a gramatica";
             }
             try {
                 if (p.getTolken().equals("ESPACO")) {
@@ -146,7 +148,7 @@ public class AnalisadorSintatico {
             } catch (Exception e) {
                 erroNaLinha = true;
                 palavrasLinha.add(p);
-                mensagemErro += "  ------ " + e.getMessage();
+                mensagemErro += "          " + e.getMessage();
             }
         }
         if (!palavrasLinha.isEmpty()) {
