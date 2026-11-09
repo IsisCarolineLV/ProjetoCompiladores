@@ -1,21 +1,38 @@
-PROGRAM lacoCondicional.
-VAR
-    contador : INTEGER;
-    limite : INTEGER;
-BEGIN
-    contador := 0;
-    limite := 10;
-    
-    WHILE contador < limite DO
-    BEGIN
-        IF contador >= 5 THEN
-            WRITELN("Passou da metade")
-        ELSE
-            WRITELN("Inicio do laco");
-            
-        contador := contador + 1;
-    END;
-    
-    IF contador <> 0 THEN
-        WRITE("Finalizado com sucesso");
-END.
+program expressoes;
+var
+    x, y, z : integer;
+begin
+    a := 10 + 5 * 2;
+    b := (10 + 5) * 2;
+    c := a * (b + 3) div 2 mod 4;
+
+    if a = b then
+        c := 1;
+
+    if a <> b then
+        c := 2
+    else
+        c := 3;
+
+    if a <= b then
+        c := 4;
+
+    if a >= b then
+        c := 5;
+
+    if a < b then
+        c := 6;
+
+    if a > b then
+        c := 7;
+
+    while c > 0 do
+    begin
+        total := total + c;
+        c := c - 1;
+    end;
+
+    a := +10;
+    b := 5 + 3 * 2;
+    c := (a + b) * (20 - 5);
+end.

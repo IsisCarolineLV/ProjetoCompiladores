@@ -1,0 +1,71 @@
+program testeCompleto;
+
+var
+    a, b, c: integer;
+    resultado: real;
+
+procedure somar(x, y: integer; var z: real);
+begin
+    z := x + y;
+end;
+
+procedure multiplicar(var x: integer);
+begin
+    x := x * 2;
+end;
+
+begin
+    a := 10;
+    b := 20;
+    c := 30;
+
+    resultado := a + b * c;
+    resultado := (a + b) * c;
+
+    if a = b then
+        resultado := 1
+    else
+        resultado := 2;
+
+    if a <> b then
+        resultado := 3;
+
+    if a <= b then
+        resultado := 4;
+
+    if a >= b then
+        resultado := 5;
+
+    while a < b do
+        a := a + 1;
+
+    while b > a do
+    begin
+        b := b + 1;
+        a := a + 1;
+    end;
+
+    somar(a, b, resultado);
+    multiplicar(a);
+
+    resultado := a + ;
+    resultado := * b;
+    resultado := (a + b)) * c;
+
+    if a > then
+        b := 10;
+
+    while a < 100 do
+        a := a + 1
+        b := b + 1;
+
+    if a = b then
+    else
+        c := 10;
+
+    somar(a, b);
+
+    resultado := a div;
+    resultado := a mod b +;
+
+end.

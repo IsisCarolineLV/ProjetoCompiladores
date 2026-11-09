@@ -1,0 +1,36 @@
+program testeErros;
+
+var
+    x, y integer;
+    total: ;
+    media: real;
+
+procedure calcular(a, b integer);
+begin
+    total := a + b
+    media := total / 2;
+end;
+
+begin
+    x := 10;
+    y := ;
+    total := x + y;
+
+    if x > 10
+        total := 20;
+    else
+        total := 30;
+
+    while x < 20
+        x := x + 1;
+
+    media := (x + y;
+
+    repeat
+        x := x + 1;
+    until x > 30;
+
+    calcular();
+
+    total := 10 - ;
+end.

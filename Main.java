@@ -9,13 +9,17 @@ import javax.swing.*; // Importa a estrutura de lista dinamica
 // Classe principal que gerencia a interface grafica (GUI), leitura de arquivos e orquestracao da analise
 public class Main{
     private static String caminhoAtual=""; // Guarda o endereco (caminho absoluto) do arquivo selecionado no computador
-    private static AnalisadorLexico analisador; // Referencia para a instancia do motor do analisador lexico
+    //private static AnalisadorLexico analisadorLexico; // Referencia para a instancia do motor do analisador lexico
+    //private static AnalisadorSintatico analisadorSintatico; // Referencia para a instancia do motor do analisador lexico
     private static JLabel areaErro; // Rotulo visual no rodape que exibe a mensagem descritiva do erro lexico
     private static JPanel areaConteudo; // Painel central onde as linhas do codigo-fonte sao desenhadas
     private static JLabel lblTitulo; // Rotulo que exibe o nome do arquivo selecionado na tela
+    private static boolean mostrando = false;
+    private static boolean arquivoFoiAtualizado = false;
 
     private static StringBuilder texto; // Armazena todo o conteudo textual lido do arquivo antes da analise
     private static ArrayList<Linha> linhasComErro; // Lista que guarda apenas as linhas que apresentaram erro para navegacao
+    private static ArrayList<Linha> linhasErradasLexico, linhasErradasSintatico;
     private static int contErro=0; // indice que controla qual erro esta sendo focado no momento pelos botoes
 
     //botoes:
@@ -23,16 +27,25 @@ public class Main{
     private static JButton btnAnalisar; // Botao para disparar a analise lexica sobre o arquivo carregado
     private static JButton btnErroAnterior; // Botao para subir ate o erro lexico anterior
     private static JButton btnProximoErro; // Botao para descer ate o proximo erro lexico
+    private static JButton btnAnalisarLexico; // Botao para analisar apenas lexicalmente
+    private static JButton btnAnalisarSintatico; // Botao para analisar sintaticamente
+    private static JButton btnMostrar; // Botao para mostrar os botoes de analise lexica e sintatica
+
+    //listas de linhas:
+    private static ArrayList<Linha> resultadoAnalise;
+    private static ArrayList<Palavra> listaPalavras;
     
     // Metodo de entrada padrao da aplicacao Java
     public static void main(String[] args){
-        //criarTela();
+        //ativarDarkNimbus();
         // Garante que a interface grafica seja construida e executada na Thread de despacho de eventos do Swing (EDT)
         SwingUtilities.invokeLater(Main::criarTela);
     } 
 
     // Metodo responsavel por instanciar, configurar e posicionar todos os elementos visuais da janela
     public static void criarTela() {
+
+        Tabela.preencher();
 
         //configuracoes do rotulo
         // Obtem o gerenciador global de ToolTips (aqueles baloes que mostram o tipo do token ao passar o mouse)
@@ -67,10 +80,26 @@ public class Main{
         btnProximoErro = new JButton("⬇ Proximo Erro"); // Instancia o botao de avancar erro
         btnProximoErro.setEnabled(false); // Comeca desabilitado (so ativa se houver erros apos a analise)
 
+        btnMostrar = new JButton("+");
+
+        btnAnalisarLexico = new JButton("Analise Lexica"); // Instancia o botao de analisar tokens
+        btnAnalisarLexico.setEnabled(false); // Comeca desabilitado (so ativa apos o usuario escolher um arquivo)
+        btnAnalisarLexico.setVisible(false);
+
+        btnAnalisarSintatico = new JButton("Analise Sintatica"); // Instancia o botao de analisar tokens
+        btnAnalisarSintatico.setEnabled(false); // Comeca desabilitado (so ativa apos o usuario escolher um arquivo)
+        btnAnalisarSintatico.setVisible(false);
+
         organizadorH.add(btnPesquisar); // Adiciona o botao Pesquisar na barra horizontal
         organizadorH.add(Box.createRigidArea(new Dimension(5, 0))); // Cria um espacamento invisivel de 5px horizontais entre os botoes
         organizadorH.add(btnAnalisar); // Adiciona o botao Analisar
         organizadorH.add(Box.createRigidArea(new Dimension(5, 0))); // Espacamento de 5px
+        organizadorH.add(btnMostrar); // Adiciona o botao Mostrar
+        organizadorH.add(Box.createRigidArea(new Dimension(5, 0))); // Espacamento de 5px
+        organizadorH.add(btnAnalisarLexico); // Adiciona o botao Analisar
+        organizadorH.add(Box.createRigidArea(new Dimension(5, 0))); // Espacamento de 5px
+        organizadorH.add(btnAnalisarSintatico); // Adiciona o botao Analisar
+        organizadorH.add(Box.createRigidArea(new Dimension(50, 0))); // Espacamento de 5px
         organizadorH.add(btnErroAnterior); // Adiciona o botao Erro Anterior
         organizadorH.add(Box.createRigidArea(new Dimension(5, 0))); // Espacamento de 5px
         organizadorH.add(btnProximoErro); // Adiciona o botao Proximo Erro
@@ -93,12 +122,14 @@ public class Main{
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT); // Alinha a caixa de codigo a esquerda
         scrollPane.setMinimumSize(new Dimension (0,100));
         scrollPane.setPreferredSize(new Dimension(1024,500));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(24);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(24);
 
         // Pane normal para aparecer o erro
         
         JPanel paneErro = new JPanel(new BorderLayout()); // Cria o painel inferior para exibir os detalhes dos erros
         paneErro.setBorder(BorderFactory.createTitledBorder("Painel de Erro")); // Cria uma borda desenhada com o titulo "Painel de Erro"
-        areaErro = new JLabel("Nenhum erro encontrado."); // Texto inicial quando nao ha erros
+        areaErro = new JLabel("         Nenhum erro encontrado."); // Texto inicial quando nao ha erros
         areaErro.setForeground(Color.RED); // Pinta a fonte da mensagem de erro de vermelho
         paneErro.add(new JScrollPane(areaErro), BorderLayout.CENTER); // Coloca o texto de erro dentro de uma area com rolagem no centro do painel
         
@@ -119,17 +150,21 @@ public class Main{
         frame.add(organizadorV); // Insere o organizador vertical completo dentro da janela principal
         frame.setVisible(true); // Torna a janela visivel na tela para o usuario
 
-        //listeners
+        //LISTENERS ------------------------------------------------------------------------------------------------------
         // Define a acao executada ao clicar no botao "Pesquisar"
         btnPesquisar.addActionListener(e ->{
             String t = chamarTelaPesquisa(); // Abre a janela de selecao de arquivos e recebe o nome do arquivo escolhido
             if(!t.equals("nenhum arquivo selecionado")){
                 areaConteudo.removeAll(); // Limpa o codigo anterior que estava na tela
+                resultadoAnalise = null; //limpa as linhas salvas
+                resultadoAnalise = null;  //limpa as linhas salvas
                 lblTitulo.setText("Arquivo: "+t); // Atualiza o rotulo com o nome do novo arquivo
                 //System.out.println("Caminho lido:" +caminhoAtual);
                 texto = getTexto(); // Le o arquivo do disco, exibe o texto bruto na tela e guarda no StringBuilder
+                btnAnalisar.setEnabled(true); // Libera o botao "Analisar" para uso
+                btnAnalisarLexico.setEnabled(true);
+                btnAnalisarSintatico.setEnabled(false);
             }
-            btnAnalisar.setEnabled(true); // Libera o botao "Analisar" para uso
         });
 
         // Define a acao executada ao clicar no botao "Analisar"
@@ -137,20 +172,59 @@ public class Main{
             if(caminhoAtual.equals("")){
                 areaErro.setText("Nenhum arquivo selecionado!"); // Prevencao caso tente analisar sem ter escolhido um arquivo
             }else{
-                analisador = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
-                ArrayList<Linha> linhas = analisador.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
-                linhasComErro = analisador.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
-                imprimirArquivo(linhas); // Substitui o texto bruto na tela pelas linhas analisadas com destaque de sintaxe e tooltips
-                contErro=0; // Posiciona o indice de navegacao no primeiro erro (posicao 0)
-                
-                // Se pelo menos 1 linha apresentou erro lexico, ativa a navegacao de erros e foca no primeiro erro
-                if(linhasComErro.size()>=1){
-                    btnErroAnterior.setEnabled(true);
-                    btnProximoErro.setEnabled(true);
-                    mostraErro(linhasComErro, 0); // Destaca a primeira linha com erro na tela
-                }
+                texto = getMudancas(); // Le o arquivo do disco para captar mudancas
+                AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
+                resultadoAnalise = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
+                listaPalavras = analisadorLexico.listaPalavras;
+                AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico();
+                resultadoAnalise = analisadorSintatico.analisar(listaPalavras);
+                linhasErradasSintatico  = analisadorSintatico.getLinhasErradas();
+                linhasComErro = linhasErradasSintatico;
+                imprimir(resultadoAnalise, linhasComErro);
             }
-            
+        });
+
+        // Define a acao do botao "Mostrar": mostra ou esconde os botoes de passo a passo
+        btnMostrar.addActionListener(e->{
+            mostrando = !mostrando;
+            btnAnalisarLexico.setVisible(mostrando);
+            btnAnalisarSintatico.setVisible(mostrando);
+
+            if(mostrando)   btnMostrar.setText("-");
+            else    btnMostrar.setText("+");
+        });
+
+        btnAnalisarLexico.addActionListener(e ->{
+            if(caminhoAtual.equals("")){
+                areaErro.setText("Nenhum arquivo selecionado!"); // Prevencao caso tente analisar sem ter escolhido um arquivo
+            }else{
+                arquivoFoiAtualizado = false;
+                StringBuilder textoAux = getMudancas(); // Le o arquivo do disco para captar mudancas
+                if(!texto.equals(textoAux)){
+                    texto = textoAux;
+                    AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto); // Instancia o motor lexico passando o texto bruto do arquivo
+                    resultadoAnalise = analisadorLexico.classificarTolkens(); // Executa toda a analise lexica e recebe as linhas prontas e coloridas
+                    linhasErradasLexico = analisadorLexico.getLinhasErradas(); // Recupera a lista contendo apenas as linhas que deram erro lexico
+                    arquivoFoiAtualizado = true;
+                    listaPalavras = analisadorLexico.listaPalavras;
+                }
+                linhasComErro = linhasErradasLexico;
+                imprimir(resultadoAnalise, linhasComErro);
+                
+                btnAnalisarSintatico.setEnabled(true);
+            }
+        });
+
+        btnAnalisarSintatico.addActionListener(e->{
+            if(arquivoFoiAtualizado){
+                AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(); // Instancia o motor lexico passando o texto bruto do arquivo
+                resultadoAnalise = analisadorSintatico.analisar(listaPalavras);
+                linhasErradasSintatico = analisadorSintatico.getLinhasErradas();
+            }
+            linhasComErro = linhasErradasSintatico;
+            System.out.println("analisou sintaticamente :)");
+            imprimir(resultadoAnalise, linhasComErro);
         });
 
         // Define a acao do botao "Proximo Erro": avanca o contador e foca na proxima linha problematica
@@ -164,6 +238,20 @@ public class Main{
             contErro--;
             mostraErro(linhasComErro, contErro);
         });
+    }
+
+    private static void imprimir(ArrayList<Linha> resultado, ArrayList<Linha> linhasErradas){
+        imprimirArquivo(resultado); // Substitui o texto bruto na tela pelas linhas analisadas com destaque de sintaxe e tooltips
+        contErro=0; // Posiciona o indice de navegacao no primeiro erro (posicao 0)
+        
+        // Se pelo menos 1 linha apresentou erro lexico, ativa a navegacao de erros e foca no primeiro erro
+        if(linhasErradas.size()>=1){
+            btnErroAnterior.setEnabled(true);
+            btnProximoErro.setEnabled(true);
+            mostraErro(linhasErradas, 0); // Destaca a primeira linha com erro na tela
+        }else{
+            areaErro.setText("        Nenhum erro encontrado :)");
+        }
     }
     
 
@@ -222,6 +310,21 @@ public class Main{
         return texto; // Retorna o conteudo completo do arquivo pronto para ser enviado ao AnalisadorLexico
     }
 
+    public static StringBuilder getMudancas(){
+        StringBuilder texto= new StringBuilder(""); // Inicia o acumulador mutavel de texto vazio
+        // Usa try-with-resources para abrir o arquivo e garantir que ele sera fechado automaticamente ao terminar a leitura
+        try (BufferedReader br = new BufferedReader(new FileReader(caminhoAtual))) {
+            String linha;
+            // Le o arquivo linha por linha ate chegar ao fim (null)
+            while ((linha = br.readLine()) != null) {
+                texto.append( linha +"\n"); // Anexa a linha lida e a quebra de linha '\n' no StringBuilder que ira para o analisador
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Imprime o erro no console caso o arquivo nao seja encontrado ou nao possa ser lido
+        }
+        return texto;
+    }
+
     // Metodo que substitui a visualizacao bruta pela visualizacao processada (com cores por token, tooltips e fundos de erro)
     public static void imprimirArquivo(ArrayList<Linha> linhas){
         areaConteudo.removeAll(); // Remove todas as linhas brutas que estavam desenhadas na tela
@@ -255,5 +358,42 @@ public class Main{
         
         return novaLinha; // Retorna o painel simples para ser exibido na pre-visualizacao
 
+    }
+
+    public static void ativarDarkNimbus() {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        // Paleta base
+        UIManager.put("control",            new Color(0x2E2E2E));
+        UIManager.put("info",               new Color(0x1E1E1E));
+        UIManager.put("nimbusBase",         new Color(0x1A1A1A));
+        UIManager.put("nimbusBlueGrey",     new Color(0x2A2A2A));
+        UIManager.put("nimbusLightBackground", new Color(0x1E1E1E));
+        UIManager.put("nimbusSelectionBackground", new Color(0x3A6EA5));
+
+        UIManager.put("text",               Color.WHITE);
+        UIManager.put("Label.foreground",   Color.WHITE);
+        UIManager.put("Button.foreground",  Color.WHITE);
+        UIManager.put("Panel.background",   new Color(0x1E1E1E));
+        UIManager.put("ScrollPane.background", new Color(0x1E1E1E));
+        UIManager.put("Viewport.background",   new Color(0x1E1E1E));
+        UIManager.put("TitledBorder.titleColor", Color.LIGHT_GRAY);
+
+        UIManager.put("Button.background",  new Color(0x3A3A3A));
+        UIManager.put("Button.select",      new Color(0x4A4A4A));
+        UIManager.put("Button.focus",       new Color(0x555555));
+
+        UIManager.put("ScrollBar.thumb",    new Color(0x555555));
+        UIManager.put("ScrollBar.track",    new Color(0x2A2A2A));
+
+        UIManager.put("ToolTip.background", new Color(0x2A2A2A));
+        UIManager.put("ToolTip.foreground", Color.WHITE);
     }
 }

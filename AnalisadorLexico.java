@@ -5,13 +5,14 @@ public class AnalisadorLexico {
 
     private StringBuilder texto; // Armazena todo o codigo-fonte carregado do arquivo
     private int i; // Ponteiro global (cabecote de leitura) que guarda a posicao do caractere atual no texto
+    public ArrayList<Palavra> listaPalavras;
     private ArrayList<Linha> linhasErradas = new ArrayList<>(); // Lista que armazena apenas as linhas que contem erros lexicos
     // Dicionario estatico contendo todas as palavras reservadas da linguagem (baseada em Pascal)
     private static String[] palavrasReservadas = { "ABSOLUTE", "ARRAY", "BEGIN", "CASE",
-        "CHAR", "CONST", "DIV", "DO", "DOWTO", "ELSE", "END", "EXTERNAL",
+        "CHAR", "CONST", "DIV", "DO", "DOWNTO", "ELSE", "END", "EXTERNAL", 
         "FILE", "FOR", "FORWARD", "FUNC", "FUNCTION", "GOTO", "IF", "IMPLEMENTATION",
-        "INTEGER", "INTERFACE", "INTERRUPT", "LABEL", "MAIN", "NIL", "NIT",
-        "OF", "PACKED", "PROC", "PROGRAM", "REAL", "RECORD", "REPEAT", "SET",
+        "INTEGER", "INTERFACE", "INTERRUPT", "LABEL", "MAIN", "MOD", "NIL", "NIT",
+        "OF", "PACKED", "PROC","PROCEDURE", "PROGRAM", "REAL", "RECORD", "REPEAT", "SET",
         "SHL", "SHR", "STRING", "THEN", "TO", "TYPE", "UNIT", "UNTIL", "USES",
         "VAR", "WHILE", "WITH", "XOR", "READ", "WRITE", "WRITELN"};
 
@@ -77,6 +78,7 @@ public class AnalisadorLexico {
         }
         System.out.println("------------------------------------------");
 
+        listaPalavras = palavras;
         // Envia a lista linear de palavras para ser organizada em objetos Linha e retorna para a tela principal
         return geradorLinhas(palavras);
     }
@@ -370,18 +372,6 @@ public class AnalisadorLexico {
                 return novoId;
             }
         }
-
-        /*for(String o: operacoesLogicas){
-            if(lexema.equalsIgnoreCase(o)){
-                novoId = new Palavra(lexema, "operador logico");
-                return novoId;
-            }
-        }
-
-        if(lexema.equalsIgnoreCase("mod")){
-            novoId = new Palavra(lexema, "operador aritmetico");
-            return novoId;
-        }*/
         
         // Se nao consta na lista de palavras reservadas, classifica como identificador (nome de variavel/funcao)
         novoId = new Palavra(lexema, "identificador");
@@ -421,7 +411,7 @@ public class AnalisadorLexico {
             } catch (Exception e) {
                 erroNaLinha = true; // Sinaliza que a linha atual possui erro lexico
                 palavrasLinha.add(p); // Adiciona a palavra invalida na linha mesmo assim para ela ser exibida na tela
-                mensagemErro+="  ------ "+e.getMessage(); // Concatena o detalhe do erro (ex: "identificador invalido: @")
+                mensagemErro+="           "+e.getMessage(); // Concatena o detalhe do erro (ex: "identificador invalido: @")
             }
         }
 

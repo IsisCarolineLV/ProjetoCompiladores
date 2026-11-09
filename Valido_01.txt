@@ -1,12 +1,18 @@
-PROGRAM basico.
-VAR
-    idade : INTEGER;
-    nome : STRING;
-    salario : REAL;
-BEGIN
-    idade := 20 + 5;
-    salario := 1500 / 2;
-    nome := "Kauan";
-    
-    WRITELN(nome);
-END.
+program variaveis;
+var
+    x, y, z: integer;
+var
+    media : real;
+var
+    letra : char;
+var
+    nome : string;
+begin
+    x := 10;
+    y := 20;
+    z := x + y;
+    y := 30 - z;
+    media := z / 2;
+    letra := 65;
+    nome := 1;
+end.
