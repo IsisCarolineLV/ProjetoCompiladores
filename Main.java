@@ -37,7 +37,7 @@ public class Main{
     
     // Metodo de entrada padrao da aplicacao Java
     public static void main(String[] args){
-        //criarTela();
+        //ativarDarkNimbus();
         // Garante que a interface grafica seja construida e executada na Thread de despacho de eventos do Swing (EDT)
         SwingUtilities.invokeLater(Main::criarTela);
     } 
@@ -122,6 +122,8 @@ public class Main{
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT); // Alinha a caixa de codigo a esquerda
         scrollPane.setMinimumSize(new Dimension (0,100));
         scrollPane.setPreferredSize(new Dimension(1024,500));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(24);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(24);
 
         // Pane normal para aparecer o erro
         
@@ -356,5 +358,42 @@ public class Main{
         
         return novaLinha; // Retorna o painel simples para ser exibido na pre-visualizacao
 
+    }
+
+    public static void ativarDarkNimbus() {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        // Paleta base
+        UIManager.put("control",            new Color(0x2E2E2E));
+        UIManager.put("info",               new Color(0x1E1E1E));
+        UIManager.put("nimbusBase",         new Color(0x1A1A1A));
+        UIManager.put("nimbusBlueGrey",     new Color(0x2A2A2A));
+        UIManager.put("nimbusLightBackground", new Color(0x1E1E1E));
+        UIManager.put("nimbusSelectionBackground", new Color(0x3A6EA5));
+
+        UIManager.put("text",               Color.WHITE);
+        UIManager.put("Label.foreground",   Color.WHITE);
+        UIManager.put("Button.foreground",  Color.WHITE);
+        UIManager.put("Panel.background",   new Color(0x1E1E1E));
+        UIManager.put("ScrollPane.background", new Color(0x1E1E1E));
+        UIManager.put("Viewport.background",   new Color(0x1E1E1E));
+        UIManager.put("TitledBorder.titleColor", Color.LIGHT_GRAY);
+
+        UIManager.put("Button.background",  new Color(0x3A3A3A));
+        UIManager.put("Button.select",      new Color(0x4A4A4A));
+        UIManager.put("Button.focus",       new Color(0x555555));
+
+        UIManager.put("ScrollBar.thumb",    new Color(0x555555));
+        UIManager.put("ScrollBar.track",    new Color(0x2A2A2A));
+
+        UIManager.put("ToolTip.background", new Color(0x2A2A2A));
+        UIManager.put("ToolTip.foreground", Color.WHITE);
     }
 }

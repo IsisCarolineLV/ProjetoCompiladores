@@ -9,10 +9,10 @@ public class AnalisadorLexico {
     private ArrayList<Linha> linhasErradas = new ArrayList<>(); // Lista que armazena apenas as linhas que contem erros lexicos
     // Dicionario estatico contendo todas as palavras reservadas da linguagem (baseada em Pascal)
     private static String[] palavrasReservadas = { "ABSOLUTE", "ARRAY", "BEGIN", "CASE",
-        "CHAR", "CONST", "DIV", "DO", "DOWTO", "ELSE", "END", "EXTERNAL",
+        "CHAR", "CONST", "DIV", "DO", "DOWNTO", "ELSE", "END", "EXTERNAL", 
         "FILE", "FOR", "FORWARD", "FUNC", "FUNCTION", "GOTO", "IF", "IMPLEMENTATION",
-        "INTEGER", "INTERFACE", "INTERRUPT", "LABEL", "MAIN", "NIL", "NIT",
-        "OF", "PACKED", "PROC", "PROGRAM", "REAL", "RECORD", "REPEAT", "SET",
+        "INTEGER", "INTERFACE", "INTERRUPT", "LABEL", "MAIN", "MOD", "NIL", "NIT",
+        "OF", "PACKED", "PROC","PROCEDURE", "PROGRAM", "REAL", "RECORD", "REPEAT", "SET",
         "SHL", "SHR", "STRING", "THEN", "TO", "TYPE", "UNIT", "UNTIL", "USES",
         "VAR", "WHILE", "WITH", "XOR", "READ", "WRITE", "WRITELN"};
 

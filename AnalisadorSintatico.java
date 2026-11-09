@@ -37,7 +37,7 @@ public class AnalisadorSintatico {
         int cont=0;
 
         while(fila.size()>0){
-            String s = buscarAcao(pilha.peek(), fila.peek());
+            String s = buscarAcao(pilha.peek(), fila.peek(), fila);
 
             if (s == null) {
                 do{
@@ -66,7 +66,7 @@ public class AnalisadorSintatico {
                 for (int i = 0; i < pop; i++) pilha.pop();
 
                 String naoTerminal = separado[1];
-                String destino = buscarAcao(pilha.peek(), naoTerminal);
+                String destino = buscarAcao(pilha.peek(), naoTerminal, fila);
                 if (destino == null) {
                     do{
                         marcarErro(listaTolkens, idxOrig.get(cont));
@@ -136,15 +136,30 @@ public class AnalisadorSintatico {
         return Tabela.tabela[estado][col];
     }
 
-    private String buscarAcao(int estado, String s) {
+    private String buscarAcao(int estado, String s, Queue<String> fila) {
         String a = buscarPar(estado, s);
         if (a != null) return a;
-        if ("identificador".equals(s)) {
-            a = buscarPar(estado, "variavel");
-            if (a != null) return a;
-            a = buscarPar(estado, "ident");
+        if (!"identificador".equals(s)) return null;
+
+        // espiar o proximo token
+        String next = null;
+        java.util.Iterator<String> it = fila.iterator();
+        if (it.hasNext()) it.next();             // pula o atual
+        if (it.hasNext()) next = it.next();
+
+        boolean temVar   = buscarPar(estado, "variavel") != null;
+        boolean temProc  = buscarPar(estado, "proc")     != null;
+        boolean temIdent = buscarPar(estado, "ident")    != null;
+
+        if (temVar && temProc) {                 // contexto ambiguo (inicio de M)
+            return ":=".equals(next)
+                ? buscarPar(estado, "variavel")
+                : buscarPar(estado, "proc");
         }
-        return a;
+        if (temVar)   return buscarPar(estado, "variavel");
+        if (temProc)  return buscarPar(estado, "proc");
+        if (temIdent) return buscarPar(estado, "ident");
+        return null;
     }
 
     // Metodo que agrupa a lista continua de tokens em objetos Linha e captura erros lexicos via excecoes

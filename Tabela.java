@@ -78,7 +78,7 @@ import java.util.Map;
 
 public class Tabela {
     // estados 0..116, colunas 0..60
-    public static String[][] tabela = new String[117][61];
+    public static String[][] tabela = new String[123][63];
     public static Map<String, Integer> simbolo = new HashMap<>();
 
     private static void setCols(int estado, int[] cols, String valor) {
@@ -97,11 +97,9 @@ public class Tabela {
         // conjuntos auxiliares
         int[] F_EX  = {10, 6, 7, 9, 12, 16};
         int[] F_SI  = {21, 22, 23, 24, 25, 26, 10, 6, 7, 9, 12, 16};
-        int[] F_T   = {17, 30, 31, 15, 21, 22, 23, 24, 25, 26, 10, 6, 7, 9, 12, 16};
-        int[] F_FAT = {18, 19, 20, 17, 30, 31, 15, 21, 22, 23, 24, 25, 26, 10, 6, 7, 9, 12, 16};
+        int[] F_T   = {17, 30, 31, 15, 21, 22, 23, 24, 25, 26, 10, 6, 7, 9, 12, 16, 61};
+        int[] F_FAT = {18, 19, 20, 17, 30, 31, 15, 21, 22, 23, 24, 25, 26, 10, 6, 7, 9, 12, 16, 61, 62};
         int[] F_OP  = {30, 31, 15, 17};
-        // F_T sem os FIRST(FAT): usado nos estados 75,76,77
-        int[] F_T_SEM_FAT = {17, 21, 22, 23, 24, 25, 26, 10, 6, 7, 9, 12, 16};
 
         // 0
         tabela[0][2]  = "E 2";
@@ -342,6 +340,7 @@ public class Tabela {
         tabela[43][58] = "72";
         tabela[43][57] = "73";
         tabela[43][60] = "44";
+        tabela[43][61] = "E 117";
 
         // 44
         tabela[44][18] = "E 75";
@@ -349,6 +348,7 @@ public class Tabela {
         tabela[44][20] = "E 77";
         setCols(44, F_T, "R T' ->  ");
         tabela[44][59] = "74";
+        tabela[44][62] = "E 120";
 
         // 45
         setCols(45, F_FAT, "R FAT -> numero");
@@ -464,6 +464,7 @@ public class Tabela {
         tabela[72][58] = "72";
         tabela[72][57] = "92";
         tabela[72][60] = "44";
+        tabela[72][61] = "E 117"; 
 
         // 73
         setCols(73, F_SI, "R Q -> T Q'");
@@ -475,21 +476,21 @@ public class Tabela {
         tabela[75][15] = "E 37";
         tabela[75][31] = "E 38";
         tabela[75][30] = "E 45";
-        setCols(75, F_T_SEM_FAT, "R T' ->  ");
+        //setCols(75, F_T_SEM_FAT, "R T' ->  ");
         tabela[75][60] = "93";
 
         // 76
         tabela[76][15] = "E 37";
         tabela[76][31] = "E 38";
         tabela[76][30] = "E 45";
-        setCols(76, F_T_SEM_FAT, "R T' ->  ");
+        //setCols(76, F_T_SEM_FAT, "R T' ->  ");
         tabela[76][60] = "94";
 
         // 77
         tabela[77][15] = "E 37";
         tabela[77][31] = "E 38";
         tabela[77][30] = "E 45";
-        setCols(77, F_T_SEM_FAT, "R T' ->  ");
+        //setCols(77, F_T_SEM_FAT, "R T' ->  ");
         tabela[77][60] = "95";
 
         // 78
@@ -558,6 +559,7 @@ public class Tabela {
         tabela[91][58] = "72";
         tabela[91][57] = "104";
         tabela[91][60] = "44";
+        tabela[91][61] = "E 117"; 
 
         // 92
         setCols(92, F_SI, "R Q' -> T Q'");
@@ -568,6 +570,7 @@ public class Tabela {
         tabela[93][20] = "E 77";
         setCols(93, F_T, "R T' ->  ");
         tabela[93][59] = "105";
+        tabela[93][62] = "E 120"; 
 
         // 94
         tabela[94][18] = "E 75";
@@ -575,6 +578,7 @@ public class Tabela {
         tabela[94][20] = "E 77";
         setCols(94, F_T, "R T' ->  ");
         tabela[94][59] = "106";
+        tabela[94][62] = "E 120";
 
         // 95
         tabela[95][18] = "E 75";
@@ -582,6 +586,7 @@ public class Tabela {
         tabela[95][20] = "E 77";
         setCols(95, F_T, "R T' ->  ");
         tabela[95][59] = "107";
+        tabela[95][62] = "E 120";
 
         // 96
         tabela[96][10] = "R M -> while EX do M";
@@ -668,6 +673,44 @@ public class Tabela {
         // 116
         tabela[116][16] = "R P'' -> ; R : tipo P''";
 
+        //117
+        tabela[117][15] = "E 37";
+        tabela[117][31] = "E 38";
+        tabela[117][30] = "E 45";
+        tabela[117][58] = "118";
+        tabela[117][60] = "44";
+
+        //118
+        tabela[118][15] = "E 37";   
+        tabela[118][31] = "E 38";   
+        tabela[118][17] = "E 71";   
+        tabela[118][61] = "E 117";  
+        tabela[118][30] = "E 45";  
+        setCols(118, F_SI, "R Q' ->  ");    
+        tabela[118][58] = "72";    
+        tabela[118][57] = "119";   
+        tabela[118][60] = "44";  
+
+        //119
+        setCols(119, F_SI, "R Q' -> - T Q'");
+
+        //120
+        tabela[120][15] = "E 37"; 
+        tabela[120][31] = "E 38";
+        tabela[120][30] = "E 45";
+        tabela[120][60] = "121";
+
+        //121
+        tabela[121][18] = "E 75";
+        tabela[121][19] = "E 76";
+        tabela[121][20] = "E 77";
+        tabela[121][62] = "E 120";
+        setCols(121, F_T, "R T' ->  ");
+        tabela[121][59] = "122";
+
+        //122
+        setCols(122, F_T, "R T' -> / FAT T'");
+
         preencherSimbolos();
     }
 
@@ -734,5 +777,7 @@ public class Tabela {
         simbolo.put("T", 58);
         simbolo.put("T'", 59);
         simbolo.put("FAT", 60);
+        simbolo.put("-", 61);
+        simbolo.put("/", 62);
     }
 }

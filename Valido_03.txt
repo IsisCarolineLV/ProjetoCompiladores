@@ -1,18 +1,22 @@
-PROGRAM numerosAvancados.
-VAR
-    pi : REAL;
-    massa : REAL;
-    velocidade : REAL;
-    letra : CHAR;
-BEGIN
-    /* Testando diferentes formatos
+program aninhados;
+var
+    x: integer;
 
- numericos validos */
-    pi := 3.1415;
-    massa := 5.97e24;
-    velocidade := 3x10e8;
-    letra := 'V';
-    
-    IF (pi > 3) ^ (massa <> 0) THEN
-        WRITE("Valores aceitos");
-END.
+procedure externo;
+var
+    y: integer;
+
+    procedure interno;
+    begin
+        y := 10;
+    end;
+
+begin
+    y := 5;
+    interno;
+    x := y;
+end;
+
+begin
+    externo;
+end.
